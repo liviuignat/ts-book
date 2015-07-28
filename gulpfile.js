@@ -1,29 +1,15 @@
 var gulp = require('gulp');
 var tslint = require('gulp-tslint');
+var runner = require('karma').runner;
+var KarmaServer = require('karma').Server;
 var ts = require('gulp-typescript');
 var browserify  = require('browserify');
 var transform   = require('vinyl-transform');
 var uglify      = require('gulp-uglify');
 var sourcemaps  = require('gulp-sourcemaps');
 var plumber = require('gulp-plumber');
-var karma = require("gulp-karma");
 var browserSync = require('browser-sync');
 var runSequence = require('run-sequence');
-
-
-// gulp.task('default', ['ts-lint', 'tsc', 'tsc-tests', 'bundle-js', 'bundle-test'], function() {
-// });
-gulp.task('default', function(cb) {
-  runSequence(
-    'ts-lint',                      // lint
-    ['tsc', 'tsc-tests'],        // compile
-    ['bundle-js','bundle-test'], // optimize
-    'karma',                      // test
-    'browser-sync',              // serve
-    cb                           // callback
-  );
-});
-
 
 gulp.task('ts-lint', function() {
   return gulp.src([
@@ -55,41 +41,62 @@ var browserified = transform(function(filename) {
   return b.bundle();
 });
 gulp.task('bundle-js', function () {
-  return gulp.src('./temp/source/js/main.js')
-   .pipe(browserified)
+  return gulp.src('./temp/source/**/*.js')
    .pipe(sourcemaps.init({ loadMaps: true }))
    .pipe(uglify())
    .pipe(sourcemaps.write('./'))
-   .pipe(gulp.dest('./dist/source/js/'));
+   .pipe(gulp.dest('./dist/source/'));
 });
 gulp.task('bundle-test', function () {
   return gulp.src('./temp/test/**/**.test.js')
-   .pipe(browserified)
    .pipe(gulp.dest('./dist/test/'));
+});
+gulp.task('html', function () {
+  return gulp.src('./index.html')
+   .pipe(gulp.dest('./dist/source'));
 });
 
 gulp.task('karma', function(cb) {
-  gulp.src('./temp/test/**/**.test.js')
-    .pipe(plumber())
-    .pipe(karma({
-       configFile: './karma.conf.js',
-       action: 'run'
-     }))
-     .on('end', cb);
+  var conf = {
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true,
+    browsers: ['PhantomJS']
+  };
+  var done = function () {
+    cb();
+  };
+
+  var server = new KarmaServer(conf, done);
+  server.start();
 });
 
-gulp.task('browser-sync', ['test'], function() {
+gulp.task('watch', function () {
+  gulp.watch([
+    './source/**/*.ts',
+    './test/**/*.ts'
+  ], ['build']);
+});
+
+gulp.task('build', function(cb) {
+  runSequence(
+    'ts-lint',
+    'tsc',
+    'tsc-tests',
+    ['bundle-js', 'html'],
+    'karma', cb
+  );
+});
+
+gulp.task('default', ['build', 'watch', 'browser-sync']);
+
+gulp.task('browser-sync', function() {
   browserSync({
     server: {
-      baseDir: "./dist"
+      baseDir: "./dist/source"
     }
   });
 
   return gulp.watch([
-    "./dist/source/js/**/*.js",
-    "./dist/source/css/**.css",
-    "./dist/test/**/**.test.js",
-    "./dist/data/**/**",
-    "./index.html"
+    "./dist/**/**",
   ], [browserSync.reload]);
 });

@@ -14,6 +14,7 @@
     ],
     "files": [
         "./source/ts/app.ts",
+        "./test/interfaces.d.ts",
         "./test/main.test.ts",
         "./typings/jquery/jquery.d.ts",
         "./typings/tsd.d.ts"
