@@ -31,3 +31,5 @@ typings
 .dist
 temp
 dist
+source/**/*.js
+test/**/*.js
