@@ -35,15 +35,22 @@ gulp.task('tsc-tests', function() {
    .pipe(ts(tsProject))
    .js.pipe(gulp.dest('./temp/test/'));
 });
+gulp.task('bower', function() {
+  return gulp.src([
+      './bower_components/jquery/dist/jquery.min.js',
+      './bower_components/q/q.js'
+    ])
+   .pipe(gulp.dest('./temp/source/vendor/'));
+});
 
 var browserified = transform(function(filename) {
   var b = browserify({ entries: filename, debug: true });
   return b.bundle();
 });
 gulp.task('bundle-js', function () {
-  return gulp.src('./temp/source/**/*.js')
+  return gulp.src(['./temp/source/vendor/**/*.js', './temp/source/js/**/*.js'])
    .pipe(sourcemaps.init({ loadMaps: true }))
-   .pipe(uglify())
+   //.pipe(uglify())
    .pipe(sourcemaps.write('./'))
    .pipe(gulp.dest('./dist/source/'));
 });
@@ -82,6 +89,7 @@ gulp.task('build', function(cb) {
     'ts-lint',
     'tsc',
     'tsc-tests',
+    'bower',
     ['bundle-js', 'html'],
     'karma', cb
   );

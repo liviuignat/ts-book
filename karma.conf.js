@@ -18,7 +18,10 @@ module.exports = function (config) {
       './temp/test/*.test.js' : ['coverage']
     },
     files: [
-      './temp/source/**/*.js',
+      // './bower_components/jquery/dist/jquery.min.js',
+      // './bower_components/q/q.js',
+      './temp/source/vendor/**/*.js',
+      './temp/source/js/**/*.js',
       './temp/test/*.test.js'
     ],
     port: 9876,

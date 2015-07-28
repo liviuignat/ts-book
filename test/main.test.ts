@@ -1,7 +1,16 @@
 /// <reference path="./interfaces.d.ts"/>
+/// <reference path="./../source/ts/app.ts"/>
 
 describe('when started', () => {
-  it('should be true', () => {
-    expect(true).to.equal(true);
+  it('jquery exists', () => {
+    expect($).to.exist;
+  });
+
+  it('Q exists', () => {
+    expect(Q).to.exist;
+  });
+
+  it('expect bat1.eat to be undefined', () => {
+    expect(bat1.eat).not.to.exist;
   });
 });

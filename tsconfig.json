@@ -17,6 +17,7 @@
         "./test/interfaces.d.ts",
         "./test/main.test.ts",
         "./typings/jquery/jquery.d.ts",
+        "./typings/q/Q.d.ts",
         "./typings/tsd.d.ts"
     ]
 }
